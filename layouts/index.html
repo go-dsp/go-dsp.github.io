@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ .Site.Title }} — signal processing in pure Go</title>
+<meta name="description" content="{{ .Site.Params.description }}">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+{{ partial "styles.html" . }}
+</head>
+<body class="lm">
+  <header class="nav"><div class="wrap">
+    <a class="brand" href="/"><img class="glyph" src="/img/logo.svg" width="32" height="32" alt="go-dsp logo"> {{ .Site.Title }}</a>
+    <nav><a href="#features">Why</a><a href="#exact">Checks</a><a href="#speed">Speed</a><a href="#repos">Repositories</a></nav>
+    {{ partial "theme-toggle.html" . }}
+  </div></header>
+  {{ partial "fork-ribbon.html" "https://github.com/go-dsp" }}
+
+  <div class="hero"><div class="wrap">
+    <div>
+      <h1 class="head">Signal processing, in pure Go.<br><span class="accent">Designed like SciPy, checked against its answers.</span></h1>
+      <p class="sub">go-dsp is the signal-processing layer of the Go scientific stack: <b>filter design and filtering</b>, <b>spectral estimation</b> and <b>resampling</b>, with the semantics of SciPy's <code>scipy.signal</code>. Its tests replay <b>recorded SciPy answers</b>, its documentation lists the error of every group of values in ULPs, and it says where it is slower. No cgo.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://go-dsp.github.io/docs/">{{ partial "icons/book.html" . }}Read the documentation →</a>
+      </div>
+      <div class="trust"><span><b>225</b> groups of values measured in ULPs</span><span><b>100%</b> statement coverage</span><span><b>28</b> speed cases against SciPy</span></div>
+    </div>
+    {{/* The example of signal's README, as the library documents it. */}}
+    <div class="term">
+      <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="t">main.go</span></div>
+<pre style="white-space:pre;overflow-x:auto;tab-size:4">import "github.com/go-dsp/signal"
+
+z, _ := signal.Butter(8, []float64{0.2}, signal.Lowpass, nil) // zeros, poles, gain
+sos, _ := z.SOS(false)                                        // second-order sections
+y, _ := signal.SOSFiltFilt(sos, x, nil)                       // zero-phase filtering
+f, p, _ := signal.Welch(x, &amp;signal.SpectralOptions{Fs: 1000, Nperseg: 1024})</pre>
+    </div>
+  </div></div>
+
+  <div class="strip"><div class="wrap">
+    <span class="lead-line">{{ len .Site.Params.repos }} repositories — <b>one library</b>: <code>go get github.com/go-dsp/signal</code></span>
+    <div class="mods">{{ range .Site.Params.repos }}<a href="{{ .href }}">{{ .name }}</a>{{ end }}</div>
+  </div></div>
+
+  <section id="features"><div class="wrap">
+    <span class="eyebrow">Why go-dsp</span>
+    <h2>The <i>scipy.signal</i> calls, in Go.</h2>
+    <p class="lead">Each function names the SciPy call it corresponds to and, where it differs, a note on MATLAB's. Option structs have useful zero values, and nothing panics on bad arguments: functions that can fail return an <code>error</code>.</p>
+    <div class="grid">
+      <div class="card"><div class="ico">〰️</div><h3>IIR design</h3><p>Butterworth, Chebyshev types 1 and 2, elliptic and Bessel filters, order selection, notch and peak filters, as zeros-poles-gain, transfer function or second-order sections.</p></div>
+      <div class="card"><div class="ico">🎚️</div><h3>FIR design and windows</h3><p>Window method, frequency-sampling, Parks–McClellan <code>Remez</code>, least squares, Kaiser order estimation, and more than twenty windows including Chebyshev and DPSS.</p></div>
+      <div class="card"><div class="ico">🔁</div><h3>Filtering</h3><p><code>LFilter</code>, <code>SOSFilt</code> and their zero-phase forms <code>FiltFilt</code> and <code>SOSFiltFilt</code>, with initial conditions; convolution, correlation and overlap-add.</p></div>
+      <div class="card"><div class="ico">📊</div><h3>Spectral estimation</h3><p>Periodogram, Welch, cross-spectrum, coherence, spectrogram, STFT and its inverse, and Lomb–Scargle for unevenly sampled data.</p></div>
+      <div class="card"><div class="ico">⏩</div><h3>Resampling</h3><p>FFT and polyphase resampling, decimation and <code>Upfirdn</code>; the analytic signal with <code>Hilbert</code>; detrending.</p></div>
+      <div class="card"><div class="ico">⛰️</div><h3>Peak finding</h3><p><code>FindPeaks</code> with height, threshold, distance, prominence, width and plateau conditions, and the prominence and width functions behind it.</p></div>
+      <div class="card"><div class="ico">📦</div><h3>Pure Go, CGO=0</h3><p>No cgo. The FIR kernels call the SIMD dot product of go-simd/floats; the transforms come from go-fft.</p></div>
+      <div class="card"><div class="ico">⚖️</div><h3>BSD-3-Clause</h3><p>Every repository of the organization. Ported code keeps its attribution in place.</p></div>
+    </div>
+  </div></section>
+
+  <section id="exact" style="padding-top:10px"><div class="wrap">
+    <span class="eyebrow">What is checked</span>
+    <h2>{{ len .Site.Params.checks }} kinds of check, each <i>against a recorded answer</i>.</h2>
+    <p class="lead">The fixtures are SciPy's own output, recorded once and replayed. What differs, and why, is in the library's documentation.</p>
+    <div class="grid">
+      {{ range .Site.Params.checks }}
+      <div class="card"><h3>{{ .name }}</h3><p>{{ .what | markdownify }}</p></div>
+      {{ end }}
+    </div>
+  </div></section>
+
+  <section id="speed" style="padding-top:10px"><div class="wrap">
+    <span class="eyebrow">Speed</span>
+    <h2>Measured against SciPy, <i>on one core</i>.</h2>
+    <p class="lead">Best of 5 interleaved rounds on one core (the SciPy process runs with its threads set to 1), on a 16-CPU darwin/arm64 host, with SciPy 1.18.1, measured 2026-10-19 and recorded in the library's <code>docs/perf.md</code>. In the 28 cases measured, no row is slower than SciPy; the closest are within 2%.</p>
+    <div class="tablewrap">
+      <table class="bench">
+        <thead><tr><th>case</th><th>go-dsp</th><th>SciPy 1.18.1</th><th>SciPy / Go</th></tr></thead>
+        <tbody>
+          <tr class="win"><td>welch, 10⁶ samples, nperseg 256 (signal)</td><td>8.42 ms</td><td>86.92 ms</td><td class="xm">10×</td></tr>
+          <tr class="win"><td>welch, 10⁶ samples, nperseg 1024 (signal)</td><td>7.83 ms</td><td>30.74 ms</td><td class="xm">3.9×</td></tr>
+          <tr class="win"><td>sosfilt, 10⁶ samples, order 8 (signal)</td><td>4.63 ms</td><td>7.20 ms</td><td class="xm">1.6×</td></tr>
+          <tr class="win"><td>sosfiltfilt, 10⁶ samples, order 8 (signal)</td><td>10.40 ms</td><td>14.94 ms</td><td class="xm">1.4×</td></tr>
+          <tr class="win"><td>fftconvolve, 10⁶ × 10⁴ (signal)</td><td>10.47 ms</td><td>19.78 ms</td><td class="xm">1.9×</td></tr>
+          <tr class="win"><td>resample_poly 1/4, 10⁶ samples (signal)</td><td>6.59 ms</td><td>15.35 ms</td><td class="xm">2.3×</td></tr>
+          <tr class="win"><td>remez, 501 taps (signal)</td><td>1.17 ms</td><td>6.54 ms</td><td class="xm">5.6×</td></tr>
+          <tr class="win"><td>find_peaks with prominence, 10⁶ samples (signal)</td><td>17.12 ms</td><td>18.96 s</td><td class="xm">1100×</td></tr>
+          <tr class="win"><td>butter order 8, zpk to sos (signal)</td><td>2.3 µs</td><td>282.7 µs</td><td class="xm">120×</td></tr>
+          <tr class="win"><td>lfilter FIR, 101 taps, 10⁶ samples (signal)</td><td>14.53 ms</td><td>14.78 ms</td><td class="xm">1.02×</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></section>
+
+  <section id="repos" style="padding-top:20px"><div class="wrap">
+    <span class="eyebrow">Repositories</span>
+    <h2>What is here.</h2>
+    <div class="road">
+      {{ range .Site.Params.repos }}
+      <div class="ph">
+        <div class="top"><h4><a href="{{ .href }}">{{ .name }}</a></h4><span class="tag active">{{ .kind }}</span></div>
+        <p>{{ .blurb | safeHTML }}</p>
+      </div>
+      {{ end }}
+    </div>
+  </div></section>
+
+  <section id="eco" style="padding-top:6px"><div class="wrap">
+    <div class="band">
+      <h2>Signal processing for the Go scientific stack.</h2>
+      <p>go-dsp builds on <a href="https://github.com/go-fft/fft"><u>go-fft</u></a> for transforms and windows, <a href="https://github.com/go-numerics/special"><u>go-numerics</u></a> for special functions and <a href="https://github.com/go-simd/floats"><u>go-simd</u></a> for its dot-product kernels. Wavelets and audio I/O are planned in this organization and not started; what <code>signal</code> does not provide is listed in the <a href="https://go-dsp.github.io/docs/"><u>documentation</u></a>.</p>
+      <a class="btn btn-ghost" href="https://github.com/go-dsp">{{ partial "icons/github.html" . }}Read the source on GitHub →</a>
+    </div>
+  </div></section>
+
+  <footer><div class="wrap"><span>go-dsp · <a href="https://github.com/go-dsp">go-dsp on GitHub</a> · BSD-3-Clause</span><span>samples in · spectra out</span></div></footer>
+</body>
+</html>
