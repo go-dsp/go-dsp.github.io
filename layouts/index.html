@@ -19,10 +19,9 @@
   <div class="hero"><div class="wrap">
     <div>
       <h1 class="head">Signal processing, in pure Go.<br><span class="accent">Designed like SciPy, checked against its answers.</span></h1>
-      <p class="sub">go-dsp is the signal-processing layer of the Go scientific stack: <b>filter design and filtering</b>, <b>spectral estimation</b> and <b>resampling</b>, with the semantics of SciPy's <code>scipy.signal</code>. Its tests replay <b>recorded SciPy answers</b>, its documentation lists the error of every group of values in ULPs, and it says where it is slower. No cgo.</p>
-      <div class="cta">
-        <a class="btn btn-primary" href="https://go-dsp.github.io/docs/">{{ partial "icons/book.html" . }}Read the documentation →</a>
-      </div>
+      <p class="sub">go-dsp is the signal-processing layer of the Go scientific stack: <b>filter design and filtering</b>, <b>spectral estimation</b> and <b>resampling</b>, with the semantics of SciPy's <code>scipy.signal</code>. Its tests replay <b>recorded SciPy answers</b>, its documentation lists the error of every group of values in ULPs, and it says where it is slower. {{ if not (partial "mantra-on.html" $) }}No cgo{{ end }}.</p>
+      {{/* [[params.cta]] in hugo.toml: the kit renders the row */}}
+      {{ partial "cta.html" . }}
       <div class="trust"><span><b>225</b> groups of values measured in ULPs</span><span><b>100%</b> statement coverage</span><span><b>28</b> speed cases against SciPy</span></div>
     </div>
     {{/* The example of signal's README, as the library documents it. */}}
@@ -53,8 +52,8 @@ f, p, _ := signal.Welch(x, &amp;signal.SpectralOptions{Fs: 1000, Nperseg: 1024})
       <div class="card"><div class="ico">📊</div><h3>Spectral estimation</h3><p>Periodogram, Welch, cross-spectrum, coherence, spectrogram, STFT and its inverse, and Lomb–Scargle for unevenly sampled data.</p></div>
       <div class="card"><div class="ico">⏩</div><h3>Resampling</h3><p>FFT and polyphase resampling, decimation and <code>Upfirdn</code>; the analytic signal with <code>Hilbert</code>; detrending.</p></div>
       <div class="card"><div class="ico">⛰️</div><h3>Peak finding</h3><p><code>FindPeaks</code> with height, threshold, distance, prominence, width and plateau conditions, and the prominence and width functions behind it.</p></div>
-      <div class="card"><div class="ico">📦</div><h3>Pure Go, CGO=0</h3><p>No cgo. The FIR kernels call the SIMD dot product of go-simd/floats; the transforms come from go-fft.</p></div>
-      <div class="card"><div class="ico">⚖️</div><h3>BSD-3-Clause</h3><p>Every repository of the organization. Ported code keeps its attribution in place.</p></div>
+      {{ if not (partial "mantra-on.html" $) }}<div class="card"><div class="ico">📦</div><h3>Pure Go, CGO=0</h3><p>{{ if not (partial "mantra-on.html" $) }}No cgo.{{ end }} The FIR kernels call the SIMD dot product of go-simd/floats; the transforms come from go-fft.</p></div>{{ end }}
+      {{ if not (partial "mantra-on.html" $) }}<div class="card"><div class="ico">⚖️</div><h3>BSD-3-Clause</h3><p>Every repository of the organization. Ported code keeps its attribution in place.</p></div>{{ end }}
     </div>
   </div></section>
 
@@ -113,6 +112,6 @@ f, p, _ := signal.Welch(x, &amp;signal.SpectralOptions{Fs: 1000, Nperseg: 1024})
     </div>
   </div></section>
 
-  <footer><div class="wrap"><span>go-dsp · <a href="https://github.com/go-dsp">go-dsp on GitHub</a> · BSD-3-Clause</span><span>samples in · spectra out</span></div></footer>
+  <footer><div class="wrap"><span>go-dsp · <a href="https://github.com/go-dsp">go-dsp on GitHub</a>{{ if not (partial "mantra-on.html" $) }} · BSD-3-Clause{{ end }}</span><span>samples in · spectra out</span></div></footer>
 </body>
 </html>
